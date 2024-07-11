@@ -1,162 +1,97 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+# implementation of First System of http://dx.doi.org/10.37394/23209.2022.19.10
+from random import randint
+from sympy.polys.domains import ZZ
 
-# C extensions
-*.so
+def generate_keys(q, d):
+    """
+    Generates public and private keys for a user using the given parameters.
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+    Args:
+    q: The size of the finite field GF(q).
+    d: The degree of the public polynomial p(x).
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+    Returns:
+    A tuple containing the public key (p(x), Q(x)) and the private key f(x).
+    """
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+    # 1. Select a random polynomial p(x) of degree d.
+    p = [randint(0, q - 1) for _ in range(d)]
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
+    # 2. Get an irreducible polynomial Q(x) of degree d+1.
+    Q = find_irreducible_polynomial(q, d + 1)
 
-# Translations
-*.mo
-*.pot
+    # 3. Use the Euclidean algorithm to find f(x) satisfying p(x)f(x) = 1 (mod Q(x)).
+    f = extended_gcd(p, Q, q)[1]
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+    # 4. Return the public key (p(x), Q(x)) and the private key f(x).
+    return (p, Q), f
 
-# Flask stuff:
-instance/
-.webassets-cache
+def find_irreducible_polynomial(q, degree):
+    """
+    Finds an irreducible polynomial of the given degree over GF(q).
 
-# Scrapy stuff:
-.scrapy
+    Args:
+    q: The size of the finite field GF(q).
+    degree: The desired degree of the irreducible polynomial.
 
-# Sphinx documentation
-docs/_build/
+    Returns:
+    An irreducible polynomial of degree `degree` over GF(q).
+    """
 
-# PyBuilder
-.pybuilder/
-target/
+    # Implementation of a polynomial irreducibility test is needed here.
+    # This can be done using various algorithms like Rabin's test.
+    # For simplicity, we'll assume a function `is_irreducible` is available.
 
-# Jupyter Notebook
-.ipynb_checkpoints
+    while True:
+        # Generate random polynomials of the desired degree until an irreducible one is found.
+        poly = [randint(0, q - 1) for _ in range(degree + 1)]
+        poly = ZZ.map(poly)
+        if is_irreducible(poly, q):
+            return poly
 
-# IPython
-profile_default/
-ipython_config.py
 
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
+def extended_gcd(a, b, q):
+    """
+    Computes the extended Euclidean algorithm for polynomials over GF(q).
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
+    Args:
+    a: The first polynomial.
+    b: The second polynomial.
+    q: The size of the finite field GF(q).
 
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
+    Returns:
+    A tuple containing the greatest common divisor (gcd) of a and b,
+    and the coefficients s and t such that gcd(a, b) = s * a + t * b.
+    """
+    # Implementation of the extended Euclidean algorithm for polynomials is needed here.
+    # This involves polynomial arithmetic operations in GF(q).
+    from sympy.polys.galoistools import gf_gcdex
+    return gf_gcdex(a, b, q, ZZ)
 
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#pdm.lock
-#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
-#   in version control.
-#   https://pdm.fming.dev/latest/usage/project/#working-with-version-control
-.pdm.toml
-.pdm-python
-.pdm-build/
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
+def is_irreducible(poly, q):
+    """
+    Checks if a polynomial is irreducible over GF(q).
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
+    Args:
+    poly: The polynomial to test.
+    q: The size of the finite field GF(q).
 
-# SageMath parsed files
-*.sage.py
+    Returns:
+    True if the polynomial is irreducible, False otherwise.
+    """
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+    # Implementation of an irreducibility test is needed here.
+    # This can be done using various algorithms like Rabin's test.
 
-# Spyder project settings
-.spyderproject
-.spyproject
+    from sympy.polys.galoistools import gf_irred_p_rabin
+    return gf_irred_p_rabin(poly, q, ZZ)
 
-# Rope project settings
-.ropeproject
 
-# mkdocs documentation
-/site
+# Example usage:
+q = 257 # Size of the finite field (must be prime)
+d = 128 # Degree of the public polynomial
+public_key, private_key = generate_keys(q, d)
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
+print("Public key:", public_key)
+print("Private key:", private_key)
